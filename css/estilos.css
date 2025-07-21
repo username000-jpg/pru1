@@ -1,0 +1,13 @@
+@media screen and (max-width: 576px) {
+  .card .fs-4 {
+    font-size: 1.2rem;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+  }
+
+  .table {
+    font-size: 0.9rem;
+  }
+}
