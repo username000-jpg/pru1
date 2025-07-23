@@ -1,5 +1,5 @@
 <?php
-require '../vendor/autoload.php';
+require '../dompdf/autoload.inc.php';  // ajusta la ruta si es necesario
 use Dompdf\Dompdf;
 
 session_start();
