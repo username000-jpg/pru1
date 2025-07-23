@@ -1,9 +1,9 @@
 <?php
-$base_url = "/control_gastos/"; // ajusta esto si el proyecto está en otra carpeta
-?>
+session_start(); // Esto SIEMPRE va al inicio, antes de cualquier echo, HTML, espacios o lo que sea
 
-<?php
+$base_url = "/control_gastos/"; // Ajusta si el proyecto está en otra ruta
 
+// Validar si el usuario está logueado
 if (!isset($_SESSION['username'])) {
     header("Location: ../index.php");
     exit();
@@ -16,8 +16,6 @@ if (!isset($_SESSION['username'])) {
     <title>Control de Gastos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -31,11 +29,11 @@ if (!isset($_SESSION['username'])) {
         <li class="nav-item"><a class="nav-link" href="../ingresos/listar.php">Ingresos</a></li>
         <li class="nav-item"><a class="nav-link" href="../gastos/listar.php">Gastos</a></li>
         <li class="nav-item"><a class="nav-link" href="../categorias/listar.php">Categorías</a></li>
-        <?php if ($_SESSION['rol'] === 'Administrador') { ?>
+        <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === 'Administrador') { ?>
           <li class="nav-item"><a class="nav-link" href="../usuarios/listar.php">Usuarios</a></li>
         <?php } ?>
       </ul>
-      <span class="navbar-text text-white me-3">Usuario: <?php echo $_SESSION['username']; ?></span>
+      <span class="navbar-text text-white me-3">Usuario: <?php echo htmlspecialchars($_SESSION['username']); ?></span>
       <a href="../logout.php" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
     </div>
   </div>
