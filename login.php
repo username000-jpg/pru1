@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("includes/conexion.php"); // asegúrate que el archivo se llama así
+include("includes/conexion.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
@@ -15,13 +15,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($usuario && password_verify($password, $usuario['password'])) {
         $_SESSION['username'] = $usuario['username'];
         $_SESSION['id_usuario'] = $usuario['id_usuario'];
-        $_SESSION['rol'] = $usuario['id_rol']; // por si usas roles luego
+        $_SESSION['rol'] = $usuario['rol']; // ¡Esta es la clave buena, causa!
 
         header("Location: dashboard.php");
         exit();
     } else {
-        echo "Usuario o contraseña incorrecta, causa.";
-        // Aquí podrías redirigir o mostrar un error decente en HTML también
+        // Mejor no usar echo aquí para evitar romper el header
+        header("Location: login.php?error=1");
+        exit();
     }
 }
 ?>
