@@ -1,5 +1,5 @@
 <?php
-session_start(); // Esto SIEMPRE va al inicio, antes de cualquier echo, HTML, espacios o lo que sea
+//session_start(); // Esto SIEMPRE va al inicio, antes de cualquier echo, HTML, espacios o lo que sea
 
 $base_url = "/control_gastos/"; // Ajusta si el proyecto está en otra ruta
 
