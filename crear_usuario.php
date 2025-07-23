@@ -1,16 +1,19 @@
-<?php
 include("includes/conexion.php");
 
 $username = "pru23";
 $password = "pru23";
 $hash = password_hash($password, PASSWORD_DEFAULT);
-$id_rol = 1;
+$nombre_completo = "Prueba 23";
+$rol = "admin"; // o "usuario"
 
-$sql = "INSERT INTO usuario (username, password, id_rol) VALUES (:username, :password, :id_rol)";
+$sql = "INSERT INTO usuario (username, password, nombre_completo, rol) 
+        VALUES (:username, :password, :nombre_completo, :rol)";
+
 $stmt = $conexion->prepare($sql);
 $stmt->bindParam(':username', $username);
 $stmt->bindParam(':password', $hash);
-$stmt->bindParam(':id_rol', $id_rol);
+$stmt->bindParam(':nombre_completo', $nombre_completo);
+$stmt->bindParam(':rol', $rol);
 
 if ($stmt->execute()) {
     echo "Usuario creado con éxito con hash: $hash";
