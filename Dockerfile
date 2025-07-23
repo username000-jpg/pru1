@@ -1,28 +1,27 @@
-# Imagen base de PHP con Apache
 FROM php:8.2-apache
 
-# Instala herramientas necesarias
+# Instala dependencias necesarias
 RUN apt-get update && apt-get install -y \
     unzip \
     git \
-    libzip-dev \
+    libpq-dev \
     zip \
-    && docker-php-ext-install zip pdo pdo_mysql
+    && docker-php-ext-install zip pdo pdo_pgsql
 
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copia todo el código fuente al contenedor
+# Copia los archivos del proyecto
 COPY . /var/www/html/
 
-# Define el directorio de trabajo
+# Establece el directorio de trabajo
 WORKDIR /var/www/html
 
-# Instala las dependencias de PHP
+# Instala dependencias PHP (como dompdf)
 RUN composer install --no-dev --optimize-autoloader
 
-# Establece permisos correctos
+# Establece permisos adecuados
 RUN chown -R www-data:www-data /var/www/html
 
-# Expone el puerto de Apache
+# Expone el puerto para Apache
 EXPOSE 80
