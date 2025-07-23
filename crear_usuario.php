@@ -1,22 +1,29 @@
+<?php
 include("includes/conexion.php");
 
-$username = "pru23";
-$password = "pru23";
-$hash = password_hash($password, PASSWORD_DEFAULT);
-$nombre_completo = "Prueba 23";
-$rol = "admin"; // o "usuario"
+try {
+    $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-$sql = "INSERT INTO usuario (username, password, nombre_completo, rol) 
-        VALUES (:username, :password, :nombre_completo, :rol)";
+    $username = "pru23";
+    $password = "pru23";
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    $nombre_completo = "Prueba 23";
+    $rol = "admin"; // o "usuario"
 
-$stmt = $conexion->prepare($sql);
-$stmt->bindParam(':username', $username);
-$stmt->bindParam(':password', $hash);
-$stmt->bindParam(':nombre_completo', $nombre_completo);
-$stmt->bindParam(':rol', $rol);
+    $sql = "INSERT INTO usuario (username, password, nombre_completo, rol)
+            VALUES (:username, :password, :nombre_completo, :rol)";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindParam(':username', $username);
+    $stmt->bindParam(':password', $hash);
+    $stmt->bindParam(':nombre_completo', $nombre_completo);
+    $stmt->bindParam(':rol', $rol);
 
-if ($stmt->execute()) {
-    echo "Usuario creado con éxito con hash: $hash";
-} else {
-    echo "Error al crear el usuario";
+    if ($stmt->execute()) {
+        echo "✅ Usuario creado con éxito con hash: $hash";
+    } else {
+        echo "❌ Error al crear el usuario.";
+    }
+
+} catch (PDOException $e) {
+    echo "🔥 Error de PDO: " . $e->getMessage();
 }
