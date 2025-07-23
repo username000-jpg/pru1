@@ -12,29 +12,32 @@ $stmt->bindParam(":id_usuario", $id_usuario);
 $stmt->execute();
 $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Obtener métodos de pago
+$metodos_pago = $conexion->query("SELECT * FROM metodo_pago ORDER BY nombre_metodo")->fetchAll(PDO::FETCH_ASSOC);
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $monto = $_POST["monto"];
     $descripcion = $_POST["descripcion"];
     $fecha = $_POST["fecha"];
-    $metodo_pago = $_POST["metodo_pago"];
+    $id_metodo_pago = $_POST["metodo_pago"];
     $id_categoria = $_POST["id_categoria"];
 
-    if (is_numeric($monto) && $monto > 0 && $id_categoria) {
-        $sql = "INSERT INTO gasto (monto, descripcion, fecha, metodo_pago, id_categoria, id_usuario)
-                VALUES (:monto, :descripcion, :fecha, :metodo_pago, :id_categoria, :id_usuario)";
+    if (is_numeric($monto) && $monto > 0 && $id_categoria && $id_metodo_pago) {
+        $sql = "INSERT INTO gasto (monto, descripcion, fecha, id_metodo_pago, id_categoria, id_usuario)
+                VALUES (:monto, :descripcion, :fecha, :id_metodo_pago, :id_categoria, :id_usuario)";
         $stmt = $conexion->prepare($sql);
         $stmt->execute([
             ':monto' => $monto,
             ':descripcion' => $descripcion,
             ':fecha' => $fecha,
-            ':metodo_pago' => $metodo_pago,
+            ':id_metodo_pago' => $id_metodo_pago,
             ':id_categoria' => $id_categoria,
             ':id_usuario' => $id_usuario
         ]);
 
         echo "<script>alert('Gasto registrado'); window.location='listar.php';</script>";
     } else {
-        echo "<div class='alert alert-danger'>Datos inválidos</div>";
+        echo "<div class='alert alert-danger'>Datos inválidos o incompletos.</div>";
     }
 }
 ?>
@@ -58,17 +61,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <select name="id_categoria" class="form-control" required>
             <option value="">Selecciona una categoría</option>
             <?php foreach ($categorias as $cat): ?>
-                <option value="<?php echo $cat['id_categoria']; ?>"><?php echo $cat['nombre_categoria']; ?></option>
+                <option value="<?= $cat['id_categoria']; ?>"><?= htmlspecialchars($cat['nombre_categoria']); ?></option>
             <?php endforeach; ?>
         </select>
     </div>
     <div class="mb-2">
         <label>Método de pago</label>
         <select name="metodo_pago" class="form-control" required>
-            <option value="Efectivo">Efectivo</option>
-            <option value="Yape">Yape</option>
-            <option value="Plin">Plin</option>
-            <option value="Transferencia">Transferencia</option>
+            <option value="">Selecciona un método</option>
+            <?php foreach ($metodos_pago as $mp): ?>
+                <option value="<?= $mp['id_metodo_pago']; ?>"><?= htmlspecialchars($mp['nombre_metodo']); ?></option>
+            <?php endforeach; ?>
         </select>
     </div>
     <button type="submit" class="btn btn-danger">Guardar</button>
