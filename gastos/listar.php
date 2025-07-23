@@ -11,14 +11,19 @@ $fecha_fin = $_GET["fecha_fin"] ?? "";
 $id_categoria = $_GET["id_categoria"] ?? "";
 $metodo_pago = $_GET["metodo_pago"] ?? "";
 
-// Categorías del usuario
+// Obtener categorías del usuario
 $categorias = $conexion->prepare("SELECT * FROM categoria WHERE id_usuario = :id_usuario");
 $categorias->execute(["id_usuario" => $id_usuario]);
 $categorias = $categorias->fetchAll(PDO::FETCH_ASSOC);
 
-// Query dinámica
-$sql = "SELECT g.*, c.nombre_categoria FROM gasto g 
+// Obtener métodos de pago
+$metodos_pago = $conexion->query("SELECT * FROM metodo_pago")->fetchAll(PDO::FETCH_ASSOC);
+
+// Consulta principal
+$sql = "SELECT g.*, c.nombre_categoria, m.nombre_metodo 
+        FROM gasto g 
         LEFT JOIN categoria c ON g.id_categoria = c.id_categoria 
+        LEFT JOIN metodo_pago m ON g.id_metodo_pago = m.id_metodo_pago 
         WHERE g.id_usuario = :id_usuario";
 
 $params = [":id_usuario" => $id_usuario];
@@ -36,11 +41,12 @@ if ($id_categoria) {
     $params[":id_categoria"] = $id_categoria;
 }
 if ($metodo_pago) {
-    $sql .= " AND g.metodo_pago = :metodo_pago";
+    $sql .= " AND g.id_metodo_pago = :metodo_pago";
     $params[":metodo_pago"] = $metodo_pago;
 }
 
 $sql .= " ORDER BY g.fecha DESC";
+
 $stmt = $conexion->prepare($sql);
 $stmt->execute($params);
 $gastos = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -52,11 +58,11 @@ $gastos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <form method="GET" class="row g-2 mb-3">
     <div class="col-md-3">
         <label>Desde</label>
-        <input type="date" name="fecha_inicio" class="form-control" value="<?php echo $fecha_inicio; ?>">
+        <input type="date" name="fecha_inicio" class="form-control" value="<?= htmlspecialchars($fecha_inicio); ?>">
     </div>
     <div class="col-md-3">
         <label>Hasta</label>
-        <input type="date" name="fecha_fin" class="form-control" value="<?php echo $fecha_fin; ?>">
+        <input type="date" name="fecha_fin" class="form-control" value="<?= htmlspecialchars($fecha_fin); ?>">
     </div>
     <div class="col-md-3">
         <label>Categoría</label>
@@ -73,8 +79,10 @@ $gastos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <label>Método de Pago</label>
         <select name="metodo_pago" class="form-control">
             <option value="">Todos</option>
-            <?php foreach (['Efectivo', 'Yape', 'Plin', 'Transferencia'] as $mp): ?>
-                <option value="<?= $mp; ?>" <?= $mp == $metodo_pago ? 'selected' : '' ?>><?= $mp; ?></option>
+            <?php foreach ($metodos_pago as $mp): ?>
+                <option value="<?= $mp['id_metodo_pago']; ?>" <?= $mp['id_metodo_pago'] == $metodo_pago ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($mp['nombre_metodo']); ?>
+                </option>
             <?php endforeach; ?>
         </select>
     </div>
@@ -99,9 +107,9 @@ $gastos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <tr>
             <td><?= number_format($gasto['monto'], 2); ?></td>
             <td><?= htmlspecialchars($gasto['descripcion']); ?></td>
-            <td><?= $gasto['nombre_categoria']; ?></td>
-            <td><?= $gasto['metodo_pago']; ?></td>
-            <td><?= $gasto['fecha']; ?></td>
+            <td><?= htmlspecialchars($gasto['nombre_categoria']); ?></td>
+            <td><?= htmlspecialchars($gasto['nombre_metodo'] ?? '—'); ?></td>
+            <td><?= htmlspecialchars($gasto['fecha']); ?></td>
         </tr>
         <?php endforeach; ?>
     </tbody>
