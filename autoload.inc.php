@@ -1,2 +1,1 @@
-<?php
-// autoload simulation for Dompdf
+<?php require (__DIR__ . '/vendor/autoload.php');
