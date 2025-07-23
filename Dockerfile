@@ -1,28 +1,28 @@
-# Imagen base con PHP + Apache
+# Imagen base de PHP con Apache
 FROM php:8.2-apache
 
-# Instalar dependencias necesarias
+# Instala herramientas necesarias
 RUN apt-get update && apt-get install -y \
     unzip \
     git \
     libzip-dev \
     zip \
-    && docker-php-ext-install zip
+    && docker-php-ext-install zip pdo pdo_mysql
 
-# Instalar Composer
+# Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copiar el proyecto completo al contenedor
+# Copia todo el código fuente al contenedor
 COPY . /var/www/html/
 
-# Establecer directorio de trabajo
+# Define el directorio de trabajo
 WORKDIR /var/www/html
 
-# Ejecutar composer install
+# Instala las dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Asegurar permisos correctos (opcional pero recomendable)
+# Establece permisos correctos
 RUN chown -R www-data:www-data /var/www/html
 
-# Exponer el puerto de Apache
+# Expone el puerto de Apache
 EXPOSE 80
