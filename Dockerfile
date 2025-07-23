@@ -1,17 +1,28 @@
+# Imagen base con PHP + Apache
+FROM php:8.2-apache
 
-# Imagen base con Apache y PHP
-FROM php:8.1-apache
+# Instalar dependencias necesarias
+RUN apt-get update && apt-get install -y \
+    unzip \
+    git \
+    libzip-dev \
+    zip \
+    && docker-php-ext-install zip
 
-# Instala extensiones necesarias (PostgreSQL)
-RUN apt-get update && \
-    apt-get install -y libpq-dev unzip git && \
-    docker-php-ext-install pdo pdo_pgsql
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copia tu código al contenedor
+# Copiar el proyecto completo al contenedor
 COPY . /var/www/html/
 
-# Da permisos a la carpeta del proyecto
+# Establecer directorio de trabajo
+WORKDIR /var/www/html
+
+# Ejecutar composer install
+RUN composer install --no-dev --optimize-autoloader
+
+# Asegurar permisos correctos (opcional pero recomendable)
 RUN chown -R www-data:www-data /var/www/html
 
-# Habilita mod_rewrite si lo necesitas
-RUN a2enmod rewrite
+# Exponer el puerto de Apache
+EXPOSE 80
