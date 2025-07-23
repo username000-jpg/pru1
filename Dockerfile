@@ -1,27 +1,27 @@
-FROM php:8.2-apache
+FROM php:8.1-apache
 
-# Instala dependencias necesarias
-RUN apt-get update && apt-get install -y \
-    unzip \
-    git \
-    libpq-dev \
-    zip \
-    && docker-php-ext-install zip pdo pdo_pgsql
+# Instala extensiones necesarias (PostgreSQL + utilidades)
+RUN apt-get update && \
+    apt-get install -y libpq-dev unzip git && \
+    docker-php-ext-install pdo pdo_pgsql
 
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copia los archivos del proyecto
+# Copia tu código al contenedor
 COPY . /var/www/html/
 
-# Establece el directorio de trabajo
+# Establece directorio de trabajo
 WORKDIR /var/www/html
 
-# Instala dependencias PHP (como dompdf)
+# Instala dependencias PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Establece permisos adecuados
+# Da permisos a la carpeta del proyecto
 RUN chown -R www-data:www-data /var/www/html
 
-# Expone el puerto para Apache
+# Habilita mod_rewrite si lo necesitas
+RUN a2enmod rewrite
+
+# Puerto que usará Apache
 EXPOSE 80
